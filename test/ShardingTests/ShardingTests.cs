@@ -23,12 +23,12 @@ public class ShardingTests
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
         
-        singleReplica.Add("one");
+        singleReplica.AddNode("one");
         circle = singleReplica.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(1, circle.Count);
 
-        singleReplica.Add("two");
+        singleReplica.AddNode("two");
         circle = singleReplica.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
@@ -38,12 +38,12 @@ public class ShardingTests
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
         
-        twoReplicas.Add("one");
+        twoReplicas.AddNode("one");
         circle = twoReplicas.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
 
-        twoReplicas.Add("two");
+        twoReplicas.AddNode("two");
         circle = twoReplicas.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
@@ -58,17 +58,17 @@ public class ShardingTests
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
         
-        sharding.Add("one");
+        sharding.AddNode("one");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
 
-        sharding.Add("two");
+        sharding.AddNode("two");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
         
-        sharding.Add("one"); // another server that has the same hash value
+        sharding.AddNode("one"); // another server that has the same hash value
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
@@ -82,28 +82,28 @@ public class ShardingTests
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
         
-        sharding.Add("one");
+        sharding.AddNode("one");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
 
-        sharding.Add("two");
+        sharding.AddNode("two");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
         
         // remove un-existing
-        sharding.Remove("three");
+        sharding.RemoveNode("three");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
         
-        sharding.Remove("one");
+        sharding.RemoveNode("one");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
         
-        sharding.Remove("two");
+        sharding.RemoveNode("two");
         circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
@@ -113,24 +113,24 @@ public class ShardingTests
     public void EmptyGetNode()
     {
         var sharding = new TestableConsistentHashSharding(2);
-        Assert.ThrowsException<IndexOutOfRangeException>(() => sharding.GetNode("one"));
+        Assert.ThrowsException<IndexOutOfRangeException>(() => sharding.GetNodeForKey("one"));
     }
 
     [TestMethod]
     public void GetNode()
     {
         var sharding = new TestableConsistentHashSharding(2);
-        sharding.Add("one");
+        sharding.AddNode("one");
 
-        Assert.AreEqual("one", sharding.GetNode("zero"));
-        Assert.AreEqual("one", sharding.GetNode("one"));
-        Assert.AreEqual("one", sharding.GetNode("two"));
+        Assert.AreEqual("one", sharding.GetNodeForKey("zero"));
+        Assert.AreEqual("one", sharding.GetNodeForKey("one"));
+        Assert.AreEqual("one", sharding.GetNodeForKey("two"));
         
-        sharding.Add("two");
-        Assert.AreEqual("one", sharding.GetNode("one0"));
-        Assert.AreEqual("one", sharding.GetNode("one1"));
-        Assert.AreEqual("two", sharding.GetNode("two0"));
-        Assert.AreEqual("two", sharding.GetNode("two1"));
+        sharding.AddNode("two");
+        Assert.AreEqual("one", sharding.GetNodeForKey("one0"));
+        Assert.AreEqual("one", sharding.GetNodeForKey("one1"));
+        Assert.AreEqual("two", sharding.GetNodeForKey("two0"));
+        Assert.AreEqual("two", sharding.GetNodeForKey("two1"));
     }
 
     [TestMethod]

@@ -1,24 +1,25 @@
-﻿// -------------------------------------------------------------------------
-// <copyright file="Murmur2.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
-// -------------------------------------------------------------------------
+﻿namespace Sharding.HashAlgorithms;
 
-namespace Sharding.HashAlgorithms;
-
+/// <summary>
+/// Hashing function implementing Murmur2 hashing algorithm.
+/// </summary>
+/// <seealso cref="HashFunction"/>
 public class Murmur2 : HashFunction
     {
+        /// <summary>
+        /// Compute hash value for the specified data.
+        /// </summary>
+        /// <param name="data">The data to compute hash for.</param>
+        /// <returns>
+        /// Hash value.
+        /// </returns>
+        /// <seealso cref="Sharding.HashFunction.ComputeHash(byte[])"/>
         public override int ComputeHash(byte[] data)
         {
             const uint seed = 89478583;
             return (int) MurmurHash2(seed, data, data.Length);
         }
 
-        // this could be rewritten to support streams tho
-        // cache the tail of the buffer if its length is not mod4 then merge with the next buffer (this is a perf hit since we cannot do our pointer magics)
-        // then the swicth and the last XORs could be moved into TransformFinal
-        // -- or --
-        // just cache tail and if we have a cache dvalue and the next block is not mod4 long then throw an exception (thus only allow random length blocks for the last one)
         private static uint MurmurHash2(uint seed32, byte[] data, int length)
         {
             const int M = 0x5bd1e995;

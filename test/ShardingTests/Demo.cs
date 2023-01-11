@@ -1,10 +1,4 @@
-﻿// -------------------------------------------------------------------------
-// <copyright file="Demo.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
-// -------------------------------------------------------------------------
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Sharding;
 
 namespace ShardingTests;
@@ -24,23 +18,23 @@ public class Demo
         // register sharding nodes
         foreach (var node in nodes)
         {
-            sharding.Add(node);
+            sharding.AddNode(node);
         }
         RunSteps(nodes, sharding);
         
         // let's remove one node
         nodes.Remove("Node-3");
-        sharding.Remove("Node-3");
+        sharding.RemoveNode("Node-3");
         RunSteps(nodes, sharding);
         
         // add the node back in
         nodes.Add("Node-3");
-        sharding.Add("Node-3");
+        sharding.AddNode("Node-3");
         RunSteps(nodes, sharding);
         
         // add a brand new node
         nodes.Add("Node-6");
-        sharding.Add("Node-6");
+        sharding.AddNode("Node-6");
         RunSteps(nodes, sharding);
     }
 
@@ -56,7 +50,7 @@ public class Demo
         for (int i = 1; i < 100; i++)
         {
             var key = $"ValueKey-{i}";
-            var node = sharding.GetNode(key);
+            var node = sharding.GetNodeForKey(key);
             counts[node]++;
         }
 
