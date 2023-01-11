@@ -9,21 +9,21 @@ using Sharding.HashAlgorithms;
 
 namespace Sharding;
 
-public class ConsistentHashSharding<T> : ISharding<T> where T : class
+public class ConsistentHashSharding : ISharding
 {
     private const int DefaultNumberOfReplicas = 100;
     private static HashFunction _hash = new Murmur2();
     
-    protected readonly SortedDictionary<int, T> Circle;
+    protected readonly SortedDictionary<int, string> Circle;
     private int _numberOfReplicas;
     //cache the ordered keys for better performance
     private int[] _keys;
 
-    public ConsistentHashSharding(IEnumerable<T> nodes, int numberOfReplicas)
+    public ConsistentHashSharding(IEnumerable<string> nodes, int numberOfReplicas)
     {
-        Circle = new SortedDictionary<int, T>();
+        Circle = new SortedDictionary<int, string>();
         _numberOfReplicas = numberOfReplicas;
-        foreach (T node in nodes)
+        foreach (string node in nodes)
         {
             AddNodeToCircle(node);
         }
@@ -31,13 +31,13 @@ public class ConsistentHashSharding<T> : ISharding<T> where T : class
         _keys = Circle.Keys.ToArray();
     }
 
-    public ConsistentHashSharding(IEnumerable<T> nodes)
+    public ConsistentHashSharding(IEnumerable<string> nodes)
         : this(nodes, DefaultNumberOfReplicas)
     { }
 
     public ConsistentHashSharding(int numberOfReplicas)
     {
-        Circle = new SortedDictionary<int, T>();
+        Circle = new SortedDictionary<int, string>();
         _numberOfReplicas = numberOfReplicas;
         _keys = Array.Empty<int>();
     }
@@ -46,33 +46,33 @@ public class ConsistentHashSharding<T> : ISharding<T> where T : class
         : this(DefaultNumberOfReplicas)
     { }
 
-    public void Add(T node)
+    public void Add(string node)
     {
         AddNodeToCircle(node);
         _keys = Circle.Keys.ToArray();
     }
 
-    private void AddNodeToCircle(T node)
+    private void AddNodeToCircle(string node)
     {
         for (int i = 0; i < _numberOfReplicas; i++)
         {
-            int hash = _hash.ComputeHash(ToBytes(node.GetHashCode().ToString() + i));
+            int hash = _hash.ComputeHash(ToBytes(node + i));
             Circle[hash] = node;
         }
     }
 
-    public void Remove(T node)
+    public void Remove(string node)
     {
         for (int i = 0; i < _numberOfReplicas; i++)
         {
-            int hash = _hash.ComputeHash(ToBytes(node.GetHashCode().ToString() + i));
+            int hash = _hash.ComputeHash(ToBytes(node + i));
             Circle.Remove(hash);
         }
         
         _keys = Circle.Keys.ToArray();
     }
 
-    public T GetNode(string key)
+    public string GetNode(string key)
     {
         int hash = _hash.ComputeHash(ToBytes(key));
         int first = FindFirstNode(_keys, hash);

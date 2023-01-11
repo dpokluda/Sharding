@@ -12,13 +12,13 @@ public class ShardingTests
     [TestMethod]
     public void Construct()
     {
-        Assert.IsNotNull(new ConsistentHashSharding<string>());
+        Assert.IsNotNull(new ConsistentHashSharding());
     }
 
     [TestMethod]
     public void NumberOfReplicas()
     {
-        var singleReplica = new TestableConsistentHashSharding<string>(1);
+        var singleReplica = new TestableConsistentHashSharding(1);
         var circle = singleReplica.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
@@ -27,14 +27,13 @@ public class ShardingTests
         circle = singleReplica.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(1, circle.Count);
-        Trace.WriteLine(string.Join(";", circle.Select((pair, i) => $"{pair.Key}:{pair.Value}")));
 
         singleReplica.Add("two");
         circle = singleReplica.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(2, circle.Count);
         
-        var twoReplicas = new TestableConsistentHashSharding<string>(2);
+        var twoReplicas = new TestableConsistentHashSharding(2);
         circle = twoReplicas.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
@@ -48,12 +47,13 @@ public class ShardingTests
         circle = twoReplicas.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(4, circle.Count);
+        Trace.WriteLine(string.Join(";", circle.Select((pair, i) => $"{pair.Key}:{pair.Value}")));
     }
     
     [TestMethod]
     public void Add()
     {
-        var sharding = new TestableConsistentHashSharding<string>(2);
+        var sharding = new TestableConsistentHashSharding(2);
         var circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
@@ -77,7 +77,7 @@ public class ShardingTests
     [TestMethod]
     public void Remove()
     {
-        var sharding = new TestableConsistentHashSharding<string>(2);
+        var sharding = new TestableConsistentHashSharding(2);
         var circle = sharding.GetCircle();
         Assert.IsNotNull(circle);
         Assert.AreEqual(0, circle.Count);
@@ -112,14 +112,14 @@ public class ShardingTests
     [TestMethod]
     public void EmptyGetNode()
     {
-        var sharding = new TestableConsistentHashSharding<string>(2);
+        var sharding = new TestableConsistentHashSharding(2);
         Assert.ThrowsException<IndexOutOfRangeException>(() => sharding.GetNode("one"));
     }
 
     [TestMethod]
     public void GetNode()
     {
-        var sharding = new TestableConsistentHashSharding<string>(2);
+        var sharding = new TestableConsistentHashSharding(2);
         sharding.Add("one");
 
         Assert.AreEqual("one", sharding.GetNode("zero"));
@@ -127,15 +127,10 @@ public class ShardingTests
         Assert.AreEqual("one", sharding.GetNode("two"));
         
         sharding.Add("two");
-        bool success = false;
-        for (int i = 0; i < 10; i++)
-        {
-            if (sharding.GetNode(i.ToString()) != "one")
-            {
-                success = true;
-            }
-        }
-        Assert.IsTrue(success);
+        Assert.AreEqual("one", sharding.GetNode("one0"));
+        Assert.AreEqual("one", sharding.GetNode("one1"));
+        Assert.AreEqual("two", sharding.GetNode("two0"));
+        Assert.AreEqual("two", sharding.GetNode("two1"));
     }
 
     [TestMethod]

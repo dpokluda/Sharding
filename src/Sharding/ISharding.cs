@@ -6,7 +6,7 @@
 
 namespace Sharding;
 
-public interface ISharding<T> where T : class
+public interface ISharding
 {
-    T GetNode(string key);
+    string GetNode(string key);
 }

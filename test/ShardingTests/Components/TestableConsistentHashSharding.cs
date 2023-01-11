@@ -8,13 +8,13 @@ using Sharding;
 
 namespace ShardingTests.Components;
 
-public class TestableConsistentHashSharding<T> : ConsistentHashSharding<T> where T : class
+public class TestableConsistentHashSharding : ConsistentHashSharding
 {
-    public TestableConsistentHashSharding(IEnumerable<T> nodes, int numberOfReplicas)
+    public TestableConsistentHashSharding(IEnumerable<string> nodes, int numberOfReplicas)
         : base(nodes, numberOfReplicas)
     { }
 
-    public TestableConsistentHashSharding(IEnumerable<T> nodes)
+    public TestableConsistentHashSharding(IEnumerable<string> nodes)
         : base(nodes)
     { }
 
@@ -25,7 +25,7 @@ public class TestableConsistentHashSharding<T> : ConsistentHashSharding<T> where
     public TestableConsistentHashSharding()
     { }
 
-    public SortedDictionary<int, T> GetCircle()
+    public SortedDictionary<int, string> GetCircle()
     {
         return Circle;
     }
